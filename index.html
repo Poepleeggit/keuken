@@ -1,0 +1,1031 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Keuken">
+<meta name="theme-color" content="#E7ECEA">
+<title>Keukenscherm Beck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Source+Sans+3:wght@400;600;700&display=swap">
+<style>
+/* Layout: havenbord. Grote klok bovenin, drie kolommen eronder (buiten / planning / lijsten), nieuwsband onderaan. */
+:root {
+  --bg: #E7ECEA;        /* zeeglas */
+  --panel: #F8FAF9;
+  --ink: #15252C;
+  --muted: #5A6B70;
+  --line: #D2DBD8;
+  --accent: #1E6E65;    /* zeegroen */
+  --accent-soft: #D7EAE6;
+  --buoy: #E6A019;      /* boeigeel */
+  --buoy-soft: #FBEBC7;
+  --warn: #C2432B;
+  --rain: #2F6DB3;
+  --rain-soft: #DCE7F4;
+  --f-display: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --f-body: "Source Sans 3", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --r: 14px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0C161C; --panel: #121F26; --ink: #D3DFE0; --muted: #7D9094; --line: #1F3039;
+    --accent: #4DB2A3; --accent-soft: #173A37; --buoy: #E2A43A; --buoy-soft: #3A2E15;
+    --warn: #E86A51; --rain: #6AA6E8; --rain-soft: #18304A; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0C161C; --panel: #121F26; --ink: #D3DFE0; --muted: #7D9094; --line: #1F3039;
+  --accent: #4DB2A3; --accent-soft: #173A37; --buoy: #E2A43A; --buoy-soft: #3A2E15;
+  --warn: #E86A51; --rain: #6AA6E8; --rain-soft: #18304A; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 400 16px/1.35 var(--f-body);
+  -webkit-tap-highlight-color: transparent;
+}
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+[hidden] { display: none !important; }
+
+.app {
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 14px;
+  padding-block: max(14px, env(safe-area-inset-top, 0px)) 0;
+  padding-left: max(18px, env(safe-area-inset-left, 0px));
+  padding-right: max(18px, env(safe-area-inset-right, 0px));
+}
+
+/* ---- Kop ---- */
+.kop { display: grid; grid-template-columns: auto 1fr auto; align-items: end; gap: 24px; }
+.klok {
+  font: 700 clamp(64px, 9vw, 112px)/0.82 var(--f-display);
+  letter-spacing: -0.01em; font-variant-numeric: tabular-nums;
+}
+.kop-mid { display: grid; gap: 6px; min-width: 0; padding-bottom: 4px; }
+.datum { font: 600 28px/1 var(--f-display); }
+.kop-tip { color: var(--muted); font-size: 17px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.kop-tip b { color: var(--ink); font-weight: 600; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; align-items: center; padding-bottom: 6px; max-width: 52vw; }
+.chip {
+  display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px; border-radius: 999px;
+  background: var(--panel); border: 1px solid var(--line); font-weight: 600; font-size: 15px; white-space: nowrap;
+}
+.chip .n { font: 700 20px/1 var(--f-display); font-variant-numeric: tabular-nums; }
+.chip.afval-nu { background: var(--buoy-soft); border-color: var(--buoy); }
+.chip.afval-nu::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--buoy); }
+.band-knoppen { flex: none; display: flex; align-items: center; gap: 8px; padding-right: max(18px, env(safe-area-inset-right, 0px)); }
+.band .status { color: var(--muted); }
+.band .knop-icoon { background: transparent; border-color: color-mix(in srgb, var(--bg) 25%, transparent); color: var(--bg); width: 34px; height: 34px; }
+.knop-icoon {
+  border: 1px solid var(--line); background: var(--panel); width: 40px; height: 40px; border-radius: 50%;
+  display: grid; place-items: center;
+}
+.knop-icoon svg { width: 20px; height: 20px; }
+.status { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); }
+.status::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+.status.uit::before { background: var(--warn); }
+.status.demo::before { background: var(--buoy); }
+
+/* ---- Raster ---- */
+.raster {
+  display: grid; gap: 14px; min-height: 0;
+  grid-template-columns: 1.08fr 1fr 1fr;
+}
+.kolom { display: grid; gap: 14px; min-height: 0; }
+.k1 { grid-template-rows: auto minmax(110px, 1fr) auto; }
+.k2 { grid-template-rows: 1fr auto; }
+.k3 { grid-template-rows: minmax(0, 1.25fr) minmax(0, 1fr) auto; }
+
+.kaart {
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--r);
+  padding: 14px 16px; min-height: 0; min-width: 0; display: flex; flex-direction: column; gap: 10px;
+}
+.kaart-kop { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.kaart h2 {
+  margin: 0; font: 600 15px/1 var(--f-display); text-transform: uppercase; letter-spacing: 0.09em; color: var(--muted);
+}
+.kaart-kop small { color: var(--muted); font-size: 13px; }
+.scroll { overflow-y: auto; min-height: 0; flex: 1; overscroll-behavior: contain; }
+.leeg { color: var(--muted); font-size: 15px; padding: 6px 0; }
+.voorbeeld { font-size: 12px; font-weight: 700; color: var(--buoy); text-transform: uppercase; letter-spacing: 0.06em; }
+
+/* ---- Weer ---- */
+.weer-nu { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; align-items: center; }
+.weer-nu svg.groot { width: 52px; height: 52px; color: var(--ink); grid-row: span 2; }
+.temp { font: 700 48px/0.9 var(--f-display); font-variant-numeric: tabular-nums; }
+.temp sup { font-size: 0.45em; vertical-align: 0.9em; margin-left: 2px; }
+.weer-sub { color: var(--muted); font-size: 15px; }
+.regen { display: grid; gap: 6px; }
+.regen-tekst { font-weight: 600; }
+.regen-tekst.nat { color: var(--rain); }
+.regen-balk { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; align-items: end; height: 32px; padding: 0 0 2px; border-bottom: 1px solid var(--line); }
+.regen-balk i { display: block; background: var(--rain); border-radius: 3px 3px 0 0; min-height: 2px; opacity: .9; }
+.regen-balk i.droog { background: var(--line); }
+.regen-tijden { display: flex; justify-content: space-between; color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.dagen { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; border-top: 1px solid var(--line); padding-top: 8px; }
+.dag { display: grid; grid-template-columns: auto auto; justify-content: center; align-items: center; gap: 0 8px; font-size: 14px; }
+.dag svg { grid-row: span 2; }
+.dag b { font: 600 17px/1 var(--f-display); text-transform: capitalize; }
+.dag svg { width: 28px; height: 28px; }
+.dag .mm { color: var(--rain); font-size: 13px; }
+.tnum { font-variant-numeric: tabular-nums; }
+
+/* ---- Radar ---- */
+.radar { padding: 0; overflow: hidden; position: relative; }
+.radar img { width: 100%; height: 100%; object-fit: cover; display: block; background: var(--rain-soft); }
+.radar .label {
+  position: absolute; left: 10px; top: 10px; background: var(--panel); border: 1px solid var(--line);
+  padding: 4px 10px; border-radius: 999px; font: 600 13px/1.2 var(--f-display); letter-spacing: .08em; text-transform: uppercase;
+}
+.radar .label.fout { color: var(--warn); }
+
+/* ---- Zee ---- */
+.zee-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px 10px; }
+.zee-grid div { display: grid; gap: 1px; }
+.zee-grid span { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.zee-grid b { font: 600 20px/1.05 var(--f-display); font-variant-numeric: tabular-nums; }
+.zee-tip { background: var(--accent-soft); color: var(--ink); border-radius: 10px; padding: 8px 12px; font-weight: 600; }
+.pijl { display: inline-block; transition: transform .3s; }
+
+/* ---- Agenda ---- */
+.ag-dag { font: 600 18px/1 var(--f-display); margin: 12px 0 6px; text-transform: capitalize; display: flex; gap: 8px; align-items: baseline; }
+.ag-dag:first-child { margin-top: 2px; }
+.ag-dag small { font: 400 13px var(--f-body); color: var(--muted); text-transform: none; }
+.ag-item { display: grid; grid-template-columns: 66px 1fr; gap: 10px; padding: 7px 0; border-top: 1px solid var(--line); align-items: start; }
+.ag-tijd { font: 600 17px/1.2 var(--f-display); font-variant-numeric: tabular-nums; }
+.ag-tijd.hele { font-size: 13px; color: var(--muted); font-family: var(--f-body); font-weight: 600; padding-top: 2px; }
+.ag-titel { font-weight: 600; display: flex; gap: 8px; align-items: baseline; }
+.ag-titel::before { content: ""; flex: none; width: 9px; height: 9px; border-radius: 50%; background: var(--kleur, var(--accent)); transform: translateY(-1px); }
+.ag-plek { color: var(--muted); font-size: 14px; padding-left: 17px; }
+.ag-item.voorbij { opacity: .45; }
+.ag-item.nu .ag-tijd { color: var(--accent); }
+
+/* ---- Eten ---- */
+.eten { display: grid; gap: 0; }
+.eten-rij {
+  display: grid; grid-template-columns: 40px 1fr; gap: 10px; align-items: center; padding: 6px 4px;
+  border-top: 1px solid var(--line); background: none; border-left: 0; border-right: 0; border-bottom: 0; text-align: left; width: 100%;
+}
+.eten-rij:first-child { border-top: 0; }
+.eten-rij .d { font: 600 16px/1 var(--f-display); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.eten-rij .g.leeg-g { color: var(--muted); font-style: italic; }
+.eten-rij.vandaag { background: var(--accent-soft); border-radius: 8px; border-top-color: transparent; }
+.eten-rij.vandaag .d { color: var(--accent); }
+.eten-rij.vandaag + .eten-rij { border-top-color: transparent; }
+.eten-rij input { width: 100%; padding: 4px 8px; border: 1px solid var(--accent); border-radius: 6px; background: var(--panel); }
+
+/* ---- Lijsten ---- */
+.lijst { list-style: none; margin: 0; padding: 0; }
+.lijst li { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; padding: 5px 0; border-top: 1px solid var(--line); }
+.lijst li:first-child { border-top: 0; }
+.vink {
+  width: 30px; height: 30px; border-radius: 8px; border: 2px solid var(--line); background: var(--panel);
+  display: grid; place-items: center; padding: 0;
+}
+.vink svg { width: 18px; height: 18px; opacity: 0; color: #fff; }
+.gedaan .vink { background: var(--accent); border-color: var(--accent); }
+.gedaan .vink svg { opacity: 1; }
+.gedaan .tekst { text-decoration: line-through; color: var(--muted); }
+.tekst { min-width: 0; overflow-wrap: anywhere; }
+.wie { font-size: 12px; font-weight: 700; color: var(--accent); background: var(--accent-soft); padding: 2px 8px; border-radius: 999px; }
+.weg { border: 0; background: none; color: var(--muted); width: 30px; height: 30px; border-radius: 8px; font-size: 20px; line-height: 1; }
+.toevoegen { display: flex; gap: 8px; }
+.toevoegen input {
+  flex: 1; min-width: 0; padding: 9px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg);
+}
+.toevoegen button, .klein-knop {
+  border: 0; border-radius: 10px; padding: 9px 14px; background: var(--accent); color: var(--panel); font-weight: 700;
+}
+.klein-knop.zacht { background: none; color: var(--muted); padding: 2px 4px; font-weight: 600; font-size: 13px; text-decoration: underline; }
+
+/* ---- Kids ---- */
+.kids { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.kind { display: grid; gap: 6px; align-content: start; }
+.kind-kop { display: flex; gap: 6px; align-items: baseline; flex-wrap: wrap; }
+.kind-kop b { font: 700 20px/1 var(--f-display); }
+.sterren { color: var(--buoy); font-size: 15px; letter-spacing: 1px; }
+.klusje {
+  text-align: left; border: 1px solid var(--line); background: var(--bg); border-radius: 10px; padding: 6px 9px; font-size: 14px; line-height: 1.15;
+}
+.klusje.klaar { background: var(--buoy-soft); border-color: var(--buoy); }
+.klusje.klaar::before { content: "★ "; color: var(--buoy); }
+.kind.alles .kind-kop b::after { content: " · klaar!"; font: 600 14px var(--f-body); color: var(--accent); }
+
+/* ---- Nieuwsband ---- */
+.band {
+  margin-left: calc(-1 * max(18px, env(safe-area-inset-left, 0px)));
+  margin-right: calc(-1 * max(18px, env(safe-area-inset-right, 0px)));
+  background: var(--ink); color: var(--bg); overflow: hidden; white-space: nowrap;
+  padding-block: 10px calc(10px + env(safe-area-inset-bottom, 0px));
+  display: flex; gap: 18px; align-items: center;
+}
+.band-label {
+  flex: none; padding-left: max(18px, env(safe-area-inset-left, 0px));
+  font: 700 15px/1 var(--f-display); letter-spacing: .1em; text-transform: uppercase; color: var(--buoy);
+}
+.band-loop { overflow: hidden; flex: 1; mask-image: linear-gradient(90deg, transparent, #000 30px, #000 calc(100% - 30px), transparent); }
+.band-rail { display: inline-flex; gap: 0; animation: rol var(--duur, 120s) linear infinite; }
+.band-rail span { font-size: 17px; font-weight: 600; padding-right: 48px; }
+.band-rail span::after { content: "●"; color: var(--buoy); font-size: 9px; margin-left: 48px; vertical-align: 3px; }
+@keyframes rol { to { transform: translateX(-50%); } }
+
+/* ---- Nachtmodus ---- */
+.nacht {
+  position: fixed; inset: 0; z-index: 20; background: #050B0E; color: #8FA3A6;
+  display: grid; place-content: center; justify-items: center; gap: 14px; text-align: center;
+  padding: max(24px, env(safe-area-inset-top, 0px)) max(24px, env(safe-area-inset-right, 0px)) max(24px, env(safe-area-inset-bottom, 0px)) max(24px, env(safe-area-inset-left, 0px));
+}
+.nacht .klok { font-size: clamp(110px, 20vw, 220px); color: #A9BCBF; }
+.nacht .datum { color: #6E8185; }
+.nacht .regel { font-size: 20px; }
+.nacht .regel b { color: #C5D3D5; font-weight: 600; }
+.nacht .hint { font-size: 13px; color: #44575B; margin-top: 18px; }
+
+/* ---- Dialoog ---- */
+dialog {
+  border: 1px solid var(--line); border-radius: var(--r); background: var(--panel); color: var(--ink);
+  width: min(520px, calc(100vw - 32px)); padding: 22px;
+}
+dialog::backdrop { background: rgba(5, 11, 14, .55); }
+dialog h3 { margin: 0 0 6px; font: 700 26px/1 var(--f-display); }
+dialog p { color: var(--muted); margin: 0 0 14px; }
+dialog label { display: grid; gap: 4px; font-weight: 600; font-size: 14px; margin-bottom: 12px; }
+dialog input { padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); }
+.dialoog-knoppen { display: flex; gap: 10px; justify-content: flex-end; margin-top: 6px; }
+
+.melding {
+  position: fixed; left: 50%; bottom: calc(70px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 30;
+  background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 10px; font-weight: 600; max-width: calc(100vw - 32px);
+}
+
+/* Groot radarbeeld */
+.radar-groot { position: fixed; inset: 0; z-index: 25; background: rgba(5, 11, 14, .85); display: grid; place-items: center; padding: 24px; }
+.radar-groot img { max-height: 100%; max-width: 100%; border-radius: var(--r); }
+
+/* ---- Telefoon / staand ---- */
+@media (max-width: 960px), (orientation: portrait) and (max-width: 1100px) {
+  html, body { height: auto; }
+  .app { height: auto; gap: 12px; }
+  .kop { grid-template-columns: auto 1fr; }
+  .chips { grid-column: 1 / -1; justify-content: flex-start; max-width: none; }
+  .klok { font-size: 64px; }
+  .datum { font-size: 22px; }
+  .kop-tip { white-space: normal; }
+  .raster { grid-template-columns: 1fr; }
+  .kolom { display: contents; }
+  .kaart { order: 5; }
+  #k-weer { order: 1; } #k-agenda { order: 2; } #k-boodschappen { order: 3; } #k-todo { order: 4; }
+  #k-eten { order: 5; } #k-kids { order: 6; } #k-zee { order: 7; } #k-radar { order: 8; aspect-ratio: 1; max-width: 100%; }
+  .scroll { overflow: visible; }
+  .kids { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .band-rail { animation: none; }
+  .pijl { transition: none; }
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-zon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><circle cx="24" cy="24" r="8.5"/><path d="M24 5v5M24 38v5M5 24h5M38 24h5M10.6 10.6l3.5 3.5M33.9 33.9l3.5 3.5M10.6 37.4l3.5-3.5M33.9 14.1l3.5-3.5"/></symbol>
+    <symbol id="i-maan" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"><path d="M31 8a16 16 0 1 0 9 26A14 14 0 0 1 31 8Z"/></symbol>
+    <symbol id="i-wolk" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"><path d="M14 34h21a8 8 0 0 0 1-15.9A11 11 0 0 0 15 20a7 7 0 0 0-1 14Z"/></symbol>
+    <symbol id="i-halfbewolkt" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8v3M6 19h3M9.2 11.2l2.1 2.1M24.8 11.2l-2.1 2.1"/><path d="M11.5 24a6 6 0 1 1 10.7-5"/><path d="M17 38h18a7 7 0 0 0 .8-14A9.5 9.5 0 0 0 18 25a6.5 6.5 0 0 0-1 13Z"/></symbol>
+    <symbol id="i-regen" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M14 28h21a8 8 0 0 0 1-15.9A11 11 0 0 0 15 14a7 7 0 0 0-1 14Z"/><path d="M17 34l-2 6M25 34l-2 6M33 34l-2 6"/></symbol>
+    <symbol id="i-sneeuw" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M14 28h21a8 8 0 0 0 1-15.9A11 11 0 0 0 15 14a7 7 0 0 0-1 14Z"/><path d="M16 36h.1M24 39h.1M32 36h.1M20 42h.1M28 42h.1" stroke-width="4"/></symbol>
+    <symbol id="i-onweer" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M14 28h21a8 8 0 0 0 1-15.9A11 11 0 0 0 15 14a7 7 0 0 0-1 14Z"/><path d="M25 30l-5 8h7l-4 7"/></symbol>
+    <symbol id="i-mist" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M8 18h32M12 25h28M8 32h28M14 39h22"/></symbol>
+    <symbol id="i-vink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-tandwiel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></symbol>
+    <symbol id="i-maan-knop" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></symbol>
+  </defs>
+</svg>
+
+<div class="app" id="app">
+  <header class="kop">
+    <div class="klok" id="klok">--:--</div>
+    <div class="kop-mid">
+      <div class="datum" id="datum"></div>
+      <div class="kop-tip" id="kop-tip">Even laden…</div>
+    </div>
+    <div class="chips" id="chips"></div>
+  </header>
+
+  <main class="raster">
+    <div class="kolom k1">
+      <section class="kaart" id="k-weer" aria-label="Weer">
+        <div class="kaart-kop"><h2>Weer in IJmuiden</h2><small id="weer-tijd"></small></div>
+        <div id="weer"><div class="leeg">Weer ophalen…</div></div>
+      </section>
+      <section class="kaart radar" id="k-radar" aria-label="Buienradar">
+        <img id="radar" alt="Buienradar, regen in Nederland afgelopen en komende uren">
+        <span class="label" id="radar-label">Buienradar</span>
+      </section>
+      <section class="kaart" id="k-zee" aria-label="Zee en strand">
+        <div class="kaart-kop"><h2>Zee &amp; strand</h2><small>getij is een indicatie</small></div>
+        <div id="zee"><div class="leeg">Zee ophalen…</div></div>
+      </section>
+    </div>
+
+    <div class="kolom k2">
+      <section class="kaart" id="k-agenda" aria-label="Agenda">
+        <div class="kaart-kop"><h2>Agenda</h2><small id="agenda-bron"></small></div>
+        <div class="scroll" id="agenda"></div>
+      </section>
+      <section class="kaart" id="k-eten" aria-label="Eetschema">
+        <div class="kaart-kop"><h2>Wat eten we</h2><small>tik op een dag om te wijzigen</small></div>
+        <div class="eten" id="eten"></div>
+      </section>
+    </div>
+
+    <div class="kolom k3">
+      <section class="kaart" id="k-todo" aria-label="To-do">
+        <div class="kaart-kop"><h2>To-do</h2><button class="klein-knop zacht" type="button" data-opruimen="Todo">afgevinkt wissen</button></div>
+        <ul class="lijst scroll" id="todo"></ul>
+        <form class="toevoegen" data-tab="Todo">
+          <input id="in-todo" placeholder="Nieuwe taak, bijv. @Femke band plakken" autocomplete="off" aria-label="Nieuwe taak">
+          <button type="submit">Erbij</button>
+        </form>
+      </section>
+      <section class="kaart" id="k-boodschappen" aria-label="Boodschappen">
+        <div class="kaart-kop"><h2>Boodschappen</h2><button class="klein-knop zacht" type="button" data-opruimen="Boodschappen">afgevinkt wissen</button></div>
+        <ul class="lijst scroll" id="boodschappen"></ul>
+        <form class="toevoegen" data-tab="Boodschappen">
+          <input id="in-boodschappen" placeholder="Wat moet er mee?" autocomplete="off" aria-label="Nieuwe boodschap">
+          <button type="submit">Erbij</button>
+        </form>
+      </section>
+      <section class="kaart" id="k-kids" aria-label="Kinderen">
+        <div class="kaart-kop"><h2>Klusjes vandaag</h2></div>
+        <div class="kids" id="kids"></div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="band" aria-label="Nieuws">
+    <span class="band-label">NOS</span>
+    <div class="band-loop"><div class="band-rail" id="band"><span>Nieuws laden…</span></div></div>
+    <div class="band-knoppen">
+      <span class="status" id="status">Laden</span>
+      <button class="knop-icoon" id="knop-nacht" type="button" aria-label="Nachtklok aan"><svg><use href="#i-maan-knop"/></svg></button>
+      <button class="knop-icoon" id="knop-instellingen" type="button" aria-label="Instellingen"><svg><use href="#i-tandwiel"/></svg></button>
+    </div>
+  </footer>
+</div>
+
+<div class="nacht" id="nacht" hidden>
+  <div class="klok" id="n-klok">--:--</div>
+  <div class="datum" id="n-datum"></div>
+  <div class="regel" id="n-weer"></div>
+  <div class="regel" id="n-morgen"></div>
+  <div class="hint">Tik om het dashboard te zien</div>
+</div>
+
+<div class="radar-groot" id="radar-groot" hidden><img id="radar-groot-img" alt="Buienradar groot"></div>
+
+<dialog id="instellingen">
+  <form method="dialog" id="form-instellingen">
+    <h3>Koppelen</h3>
+    <p>Plak hier de web-app-link van je Google Apps Script en de code uit CONFIG.TOKEN. Dit wordt alleen op dit apparaat bewaard.</p>
+    <label>Web-app-link
+      <input id="in-url" type="url" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off">
+    </label>
+    <label>Code
+      <input id="in-token" type="text" autocomplete="off">
+    </label>
+    <div class="dialoog-knoppen">
+      <button type="button" class="klein-knop zacht" id="knop-annuleren">Annuleren</button>
+      <button type="submit" class="klein-knop" id="knop-opslaan">Opslaan</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="melding" id="melding" hidden></div>
+
+<script>
+"use strict";
+/* ================= Instellingen ================= */
+const PLEK = { lat: 52.4583, lon: 4.6194 };       // IJmuiden
+const ZEE  = { lat: 52.4700, lon: 4.5300 };       // net uit de kust
+const NACHT = { van: 22 * 60, tot: 6 * 60 + 30 }; // minuten na middernacht
+const RADAR_URL = 'https://image.buienradar.nl/2.0/image/animation/RadarMapRainNL?height=512&width=500&renderBackground=True&renderBranding=False&renderText=True&history=3&forecast=6&skip=1';
+
+const opslag = {
+  get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
+};
+/* Eenmalig koppelen via een link: index.html#koppel=<script-id>~<code> */
+(function koppelViaLink() {
+  const m = location.hash.match(/^#koppel=([A-Za-z0-9_-]{20,120})~([A-Za-z0-9_-]{6,80})$/);
+  if (!m) return;
+  opslag.set('ks_url', 'https://script.google.com/macros/s/' + m[1] + '/exec');
+  opslag.set('ks_token', m[2]);
+  opslag.set('ks_data', '');
+  try { history.replaceState(null, '', location.pathname + location.search); } catch (e) { location.hash = ''; }
+})();
+let cfg = { url: opslag.get('ks_url') || '', token: opslag.get('ks_token') || '' };
+const isDemo = () => !cfg.url;
+
+/* ================= Hulpjes ================= */
+const $ = (s) => document.querySelector(s);
+function h(tag, props, ...kids) {
+  const el = document.createElement(tag);
+  if (props) for (const [k, v] of Object.entries(props)) {
+    if (v == null || v === false) continue;
+    if (k === 'class') el.className = v;
+    else if (k === 'style') el.setAttribute('style', v);
+    else if (k.startsWith('on')) el.addEventListener(k.slice(2), v);
+    else if (k === 'text') el.textContent = v;
+    else el.setAttribute(k, v === true ? '' : v);
+  }
+  for (const kid of kids.flat()) if (kid != null && kid !== false) el.append(kid.nodeType ? kid : document.createTextNode(String(kid)));
+  return el;
+}
+function icoon(naam, cls) {
+  const ns = 'http://www.w3.org/2000/svg';
+  const s = document.createElementNS(ns, 'svg');
+  if (cls) s.setAttribute('class', cls);
+  s.setAttribute('aria-hidden', 'true');
+  const u = document.createElementNS(ns, 'use');
+  u.setAttribute('href', '#i-' + naam);
+  s.append(u);
+  return s;
+}
+const pad = (n) => String(n).padStart(2, '0');
+const hhmm = (d) => pad(d.getHours()) + ':' + pad(d.getMinutes());
+const dagKey = (d) => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+const DAGNAMEN = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'];
+const KORT = ['zo', 'ma', 'di', 'wo', 'do', 'vr', 'za'];
+const MAANDEN = ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december'];
+const datumLang = (d) => { const s = DAGNAMEN[d.getDay()] + ' ' + d.getDate() + ' ' + MAANDEN[d.getMonth()]; return s.charAt(0).toUpperCase() + s.slice(1); };
+const datumKort = (d) => KORT[d.getDay()] + ' ' + d.getDate() + ' ' + MAANDEN[d.getMonth()].slice(0, 3);
+function vanKey(k) { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d); }
+function dagenTot(key, nu = new Date()) {
+  const a = new Date(nu.getFullYear(), nu.getMonth(), nu.getDate());
+  return Math.round((vanKey(key) - a) / 864e5);
+}
+function uid() { return 'w' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4); }
+
+let meldTimer;
+function meld(tekst) {
+  const m = $('#melding');
+  m.textContent = tekst; m.hidden = false;
+  clearTimeout(meldTimer);
+  meldTimer = setTimeout(() => { m.hidden = true; }, 4000);
+}
+
+/* ================= Weer-logica ================= */
+const WEER = {
+  0: ['Onbewolkt', 'zon'], 1: ['Overwegend helder', 'zon'], 2: ['Half bewolkt', 'halfbewolkt'], 3: ['Bewolkt', 'wolk'],
+  45: ['Mist', 'mist'], 48: ['Mist met rijp', 'mist'],
+  51: ['Lichte motregen', 'regen'], 53: ['Motregen', 'regen'], 55: ['Dichte motregen', 'regen'],
+  56: ['IJzel', 'regen'], 57: ['IJzel', 'regen'],
+  61: ['Lichte regen', 'regen'], 63: ['Regen', 'regen'], 65: ['Zware regen', 'regen'], 66: ['IJzel', 'regen'], 67: ['IJzel', 'regen'],
+  71: ['Lichte sneeuw', 'sneeuw'], 73: ['Sneeuw', 'sneeuw'], 75: ['Zware sneeuw', 'sneeuw'], 77: ['Sneeuwkorrels', 'sneeuw'],
+  80: ['Buien', 'regen'], 81: ['Flinke buien', 'regen'], 82: ['Zware buien', 'regen'], 85: ['Sneeuwbuien', 'sneeuw'], 86: ['Sneeuwbuien', 'sneeuw'],
+  95: ['Onweer', 'onweer'], 96: ['Onweer met hagel', 'onweer'], 99: ['Onweer met hagel', 'onweer'],
+};
+function weerInfo(code, isDag = true) {
+  const [tekst, ic] = WEER[code] || ['Onbekend', 'wolk'];
+  return { tekst, icoon: !isDag && ic === 'zon' ? 'maan' : ic };
+}
+function beaufort(ms) {
+  const grens = [0.3, 1.6, 3.4, 5.5, 8.0, 10.8, 13.9, 17.2, 20.8, 24.5, 28.5, 32.7];
+  let b = 0; while (b < grens.length && ms >= grens[b]) b++;
+  return b;
+}
+function windRichting(gr) {
+  return ['N', 'NO', 'O', 'ZO', 'Z', 'ZW', 'W', 'NW'][Math.round(((gr % 360) + 360) % 360 / 45) % 8];
+}
+function regenTekst(tijden, mm) {
+  const nat = mm.map((v) => v >= 0.1);
+  if (!nat.some(Boolean)) return { tekst: 'Droog de komende 2 uur', nat: false };
+  if (nat[0]) {
+    const j = nat.indexOf(false);
+    return { tekst: j < 0 ? 'Regen de komende 2 uur' : 'Regen, droog vanaf ' + hhmm(tijden[j]), nat: true };
+  }
+  return { tekst: 'Droog tot ' + hhmm(tijden[nat.indexOf(true)]), nat: false };
+}
+/* Hoog- en laagwater uit een uurreeks, met parabool-interpolatie voor de top. */
+function getij(tijden, hoogte, vanaf) {
+  const uit = [];
+  for (let i = 1; i < hoogte.length - 1; i++) {
+    const a = hoogte[i - 1], b = hoogte[i], c = hoogte[i + 1];
+    if (a == null || b == null || c == null) continue;
+    const top = b > a && b >= c, dal = b < a && b <= c;
+    if (!top && !dal) continue;
+    const noemer = a - 2 * b + c;
+    const off = noemer === 0 ? 0 : Math.max(-0.5, Math.min(0.5, (a - c) / (2 * noemer)));
+    const t = new Date(tijden[i].getTime() + off * 3600e3);
+    if (t >= vanaf) uit.push({ soort: top ? 'hoog' : 'laag', tijd: t });
+  }
+  return uit;
+}
+function strandTip(temp, bft, regenNu) {
+  if (bft >= 8) return 'Storm aan zee. Kijken vanaf de pier, niet erop.';
+  if (regenNu) return 'Regen, binnen blijven of jas aan';
+  if (bft >= 6) return 'Flinke wind, lekker uitwaaien op het strand';
+  if (bft >= 4) return 'Mooie kitewind bij het Kennemerstrand';
+  if (temp >= 22) return 'Strandweer, handdoeken mee';
+  if (temp >= 13) return 'Prima voor een strandwandeling';
+  return 'Frisse strandwandeling, muts op';
+}
+
+/* ================= Staat ================= */
+let weer = null, zee = null;
+let data = laadCache() || (isDemo() ? demoData() : null);
+let laatsteSync = null, offline = false;
+let bewerkDag = null;
+let nachtHandmatig = false, wakkerTot = 0;
+
+function laadCache() {
+  try { const c = JSON.parse(opslag.get('ks_data') || 'null'); return c && !isDemo() ? c : null; } catch (e) { return null; }
+}
+
+function demoData() {
+  const nu = new Date();
+  const k = (dPlus, u, m) => { const d = new Date(nu); d.setDate(d.getDate() + dPlus); d.setHours(u, m, 0, 0); return d.toISOString(); };
+  const dk = (dPlus) => { const d = new Date(nu); d.setDate(d.getDate() + dPlus); return dagKey(d); };
+  const mark = (s) => 'Voorbeeld: ' + s;
+  return {
+    demo: true, vandaag: dagKey(nu),
+    todo: [
+      { id: 'd1', taak: mark('verzekering bellen'), wie: 'Brian', gedaan: false },
+      { id: 'd2', taak: mark('cadeau regelen'), wie: 'Femke', gedaan: false },
+      { id: 'd3', taak: mark('lamp gang vervangen'), wie: '', gedaan: true },
+    ],
+    boodschappen: [
+      { id: 'b1', item: mark('melk'), gedaan: false },
+      { id: 'b2', item: mark('brood'), gedaan: false },
+      { id: 'b3', item: mark('appels'), gedaan: true },
+    ],
+    eten: ['ma', 'di', 'wo', 'do', 'vr', 'za', 'zo'].map((d, i) => ({ dag: d, gerecht: i === ((nu.getDay() + 6) % 7) ? mark('pasta pesto') : '' })),
+    kids: [
+      { id: 'k1', kind: 'Dex', taak: 'Tafel dekken', gedaan_op: dagKey(nu) },
+      { id: 'k2', kind: 'Dex', taak: 'Tanden poetsen', gedaan_op: '' },
+      { id: 'k3', kind: 'Tido', taak: 'Tafel afruimen', gedaan_op: '' },
+      { id: 'k4', kind: 'Tido', taak: 'Tanden poetsen', gedaan_op: '' },
+      { id: 'k5', kind: 'Puck', taak: 'Speelgoed opruimen', gedaan_op: '' },
+      { id: 'k6', kind: 'Puck', taak: 'Tanden poetsen', gedaan_op: '' },
+    ],
+    aftellen: [{ id: 'a1', titel: mark('vakantie'), datum: dk(23) }],
+    agenda: [
+      { titel: mark('zwemles'), start: k(0, 16, 0), eind: k(0, 17, 0), heleDag: false, plek: '', kleur: '#1E6E65' },
+      { titel: mark('verjaardag oma'), start: dk(1), eind: dk(2), heleDag: true, plek: '', kleur: '#E6A019' },
+      { titel: mark('tandarts'), start: k(3, 9, 30), eind: k(3, 10, 0), heleDag: false, plek: '', kleur: '#2F6DB3' },
+    ],
+    afval: [{ datum: dk(1), soort: mark('GFT') }],
+    nieuws: [{ titel: 'Koppel het dashboard aan je Google Sheet voor echt nieuws, agenda en lijsten' }],
+  };
+}
+
+/* ================= Klok & nachtmodus ================= */
+function isNachtTijd(d = new Date()) {
+  const m = d.getHours() * 60 + d.getMinutes();
+  return NACHT.van > NACHT.tot ? (m >= NACHT.van || m < NACHT.tot) : (m >= NACHT.van && m < NACHT.tot);
+}
+function tik() {
+  const nu = new Date();
+  const t = hhmm(nu);
+  $('#klok').textContent = t;
+  $('#n-klok').textContent = t;
+  $('#datum').textContent = datumLang(nu);
+  $('#n-datum').textContent = datumLang(nu);
+
+  // De nachtklok alleen op het grote keukenscherm, niet op telefoons.
+  const keuken = window.matchMedia ? window.matchMedia('(min-width: 961px)').matches : true;
+  const nacht = (nachtHandmatig || (keuken && isNachtTijd(nu))) && Date.now() > wakkerTot;
+  if ($('#nacht').hidden === nacht) {
+    $('#nacht').hidden = !nacht;
+    if (nacht) renderNacht();
+  }
+  // 's Avonds (en als het apparaat op donker staat) een donker dashboard, overdag licht.
+  const donker = nachtHandmatig || isNachtTijd(nu) || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  const thema = donker ? 'dark' : 'light';
+  if (document.documentElement.getAttribute('data-theme') !== thema) document.documentElement.setAttribute('data-theme', thema);
+  if (data && data.vandaag && data.vandaag !== dagKey(nu)) { data.vandaag = dagKey(nu); renderAlles(); }
+}
+$('#nacht').addEventListener('click', () => {
+  if (nachtHandmatig) { nachtHandmatig = false; }
+  wakkerTot = Date.now() + 2 * 60e3;
+  tik();
+});
+$('#knop-nacht').addEventListener('click', () => { nachtHandmatig = true; wakkerTot = 0; tik(); });
+
+/* Scherm aan houden */
+let wakeLock = null;
+async function houdWakker() {
+  try {
+    if ('wakeLock' in navigator && document.visibilityState === 'visible' && !wakeLock) {
+      wakeLock = await navigator.wakeLock.request('screen');
+      wakeLock.addEventListener('release', () => { wakeLock = null; });
+    }
+  } catch (e) { /* niet ondersteund of geweigerd */ }
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { houdWakker(); laadData(); laadWeer(); } });
+document.addEventListener('pointerdown', houdWakker);
+
+/* ================= Weer & zee ophalen ================= */
+async function laadWeer() {
+  const p = new URLSearchParams({
+    latitude: PLEK.lat, longitude: PLEK.lon, timezone: 'Europe/Amsterdam', wind_speed_unit: 'ms', forecast_days: 4,
+    current: 'temperature_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m,is_day',
+    minutely_15: 'precipitation', forecast_minutely_15: 8,
+    daily: 'weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_sum,precipitation_probability_max',
+  });
+  try {
+    const r = await fetch('https://api.open-meteo.com/v1/forecast?' + p);
+    if (!r.ok) throw new Error(r.status);
+    weer = await r.json();
+    weer.opgehaald = new Date();
+  } catch (e) { if (!weer) $('#weer').replaceChildren(h('div', { class: 'leeg', text: 'Weer niet bereikbaar. Ik probeer het over 10 minuten opnieuw.' })); }
+
+  const z = new URLSearchParams({
+    latitude: ZEE.lat, longitude: ZEE.lon, timezone: 'Europe/Amsterdam', forecast_days: 2, past_days: 1,
+    current: 'wave_height,sea_surface_temperature', hourly: 'sea_level_height_msl',
+  });
+  try {
+    const r = await fetch('https://marine-api.open-meteo.com/v1/marine?' + z);
+    if (!r.ok) throw new Error(r.status);
+    zee = await r.json();
+  } catch (e) { /* zee is bonus */ }
+  renderWeer(); renderZee(); renderKopTip();
+}
+
+function laadRadar() {
+  const img = $('#radar');
+  img.onerror = () => { img.style.visibility = 'hidden'; $('#radar-label').textContent = 'Radar niet bereikbaar'; $('#radar-label').classList.add('fout'); };
+  img.onload = () => { img.style.visibility = 'visible'; $('#radar-label').textContent = 'Buienradar · ' + hhmm(new Date()); $('#radar-label').classList.remove('fout'); };
+  img.src = RADAR_URL + '&t=' + Math.floor(Date.now() / 300e3);
+}
+$('#k-radar').addEventListener('click', () => {
+  $('#radar-groot-img').src = $('#radar').src; $('#radar-groot').hidden = false;
+});
+$('#radar-groot').addEventListener('click', () => { $('#radar-groot').hidden = true; });
+
+/* ================= Gedeelde data ophalen ================= */
+let bezig = false;
+async function laadData() {
+  if (isDemo()) { data = data && data.demo ? data : demoData(); zetStatus(); renderAlles(); return; }
+  if (bezig) return;
+  bezig = true;
+  try {
+    const r = await fetch(cfg.url + (cfg.url.includes('?') ? '&' : '?') + new URLSearchParams({ token: cfg.token, t: Date.now() }));
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.fout || 'Onbekende fout');
+    data = j; laatsteSync = new Date(); offline = false;
+    opslag.set('ks_data', JSON.stringify(j));
+    if (j.fouten && j.fouten.length) console.warn('Backend meldt:', j.fouten);
+  } catch (e) {
+    offline = true;
+    if (String(e.message).includes('Onjuiste code')) meld('De code klopt niet. Kijk bij instellingen.');
+  } finally {
+    bezig = false;
+    zetStatus(); renderAlles();
+  }
+}
+
+function zetStatus() {
+  const s = $('#status');
+  s.className = 'status' + (isDemo() ? ' demo' : offline ? ' uit' : '');
+  s.textContent = isDemo() ? 'Voorbeeld, nog niet gekoppeld' : offline ? (laatsteSync ? 'Geen verbinding sinds ' + hhmm(laatsteSync) : 'Geen verbinding') : 'Bijgewerkt ' + (laatsteSync ? hhmm(laatsteSync) : '');
+}
+
+/* Wijziging sturen: eerst direct op het scherm, dan naar de Sheet. */
+async function stuur(body, lokaal) {
+  if (data) { lokaal(data); renderAlles(); }
+  if (isDemo()) return;
+  try {
+    const r = await fetch(cfg.url, {
+      method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(Object.assign({ token: cfg.token }, body)),
+    });
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.fout);
+  } catch (e) {
+    meld('Opslaan lukte niet' + (e.message ? ': ' + e.message : '') + '. Ik haal de lijst opnieuw op.');
+  }
+  laadData();
+}
+
+/* ================= Renderen ================= */
+function renderAlles() {
+  renderAgenda(); renderEten(); renderLijst('todo'); renderLijst('boodschappen'); renderKids(); renderChips(); renderNieuws(); renderKopTip();
+  if (!$('#nacht').hidden) renderNacht();
+}
+
+function renderWeer() {
+  if (!weer) return;
+  const c = weer.current;
+  const info = weerInfo(c.weather_code, c.is_day === 1);
+  const tijden = (weer.minutely_15 && weer.minutely_15.time || []).map((t) => new Date(t));
+  const mm = (weer.minutely_15 && weer.minutely_15.precipitation || []).map((v) => v || 0);
+  const rt = regenTekst(tijden, mm);
+  const max = Math.max(0.6, ...mm);
+  const bft = beaufort(c.wind_speed_10m);
+
+  const balk = h('div', { class: 'regen-balk', 'aria-hidden': 'true' },
+    mm.map((v) => h('i', { class: v < 0.1 ? 'droog' : '', style: 'height:' + Math.max(4, Math.round(v / max * 100)) + '%' })));
+
+  const dagen = h('div', { class: 'dagen' }, [1, 2, 3].map((i) => {
+    const d = weer.daily;
+    if (!d || !d.time[i]) return null;
+    const dw = weerInfo(d.weather_code[i]);
+    return h('div', { class: 'dag' },
+      h('b', { text: KORT[vanKey(d.time[i]).getDay()] }),
+      icoon(dw.icoon),
+      h('span', { class: 'tnum', text: Math.round(d.temperature_2m_max[i]) + '° / ' + Math.round(d.temperature_2m_min[i]) + '°' }),
+      h('span', { class: 'mm tnum', text: d.precipitation_sum[i] >= 0.5 ? d.precipitation_sum[i].toFixed(1).replace('.', ',') + ' mm' : 'droog' }));
+  }));
+
+  $('#weer').replaceChildren(h('div', { style: 'display:grid;gap:10px' },
+    h('div', { class: 'weer-nu' },
+      icoon(info.icoon, 'groot'),
+      h('div', { class: 'temp' }, String(Math.round(c.temperature_2m)), h('sup', { text: '°C' })),
+      h('div', { class: 'weer-sub' }, info.tekst + ' · voelt als ' + Math.round(c.apparent_temperature) + '° · wind ' + windRichting(c.wind_direction_10m) + ' ' + bft)),
+    h('div', { class: 'regen' },
+      h('div', { class: 'regen-tekst' + (rt.nat ? ' nat' : ''), text: rt.tekst }),
+      tijden.length ? balk : null,
+      tijden.length ? h('div', { class: 'regen-tijden' }, h('span', { text: hhmm(tijden[0]) }), h('span', { text: hhmm(tijden[Math.floor(tijden.length / 2)]) }), h('span', { text: hhmm(new Date(tijden[tijden.length - 1].getTime() + 15 * 60e3)) })) : null),
+    dagen));
+  $('#weer-tijd').textContent = 'om ' + hhmm(weer.opgehaald);
+}
+
+function renderZee() {
+  if (!weer) return;
+  const c = weer.current;
+  const bft = beaufort(c.wind_speed_10m);
+  const vlaag = beaufort(c.wind_gusts_10m || 0);
+  const nu = new Date();
+  const d = weer.daily;
+  let op = d ? new Date(d.sunrise[0]) : null, onder = d ? new Date(d.sunset[0]) : null;
+  if (onder && nu > onder && d.sunrise[1]) { op = new Date(d.sunrise[1]); }
+
+  let tij = [];
+  if (zee && zee.hourly && zee.hourly.sea_level_height_msl) {
+    tij = getij(zee.hourly.time.map((t) => new Date(t)), zee.hourly.sea_level_height_msl, nu);
+  }
+  const hw = tij.find((x) => x.soort === 'hoog'), lw = tij.find((x) => x.soort === 'laag');
+  const zc = zee && zee.current || {};
+  const regenNu = (c.precipitation || 0) >= 0.1;
+  const cel = (label, waarde) => h('div', null, h('span', { text: label }), h('b', { text: waarde }));
+
+  $('#zee').replaceChildren(h('div', { style: 'display:grid;gap:10px' },
+    h('div', { class: 'zee-grid' },
+      h('div', null, h('span', { text: 'Wind (Bft)' }),
+        h('b', null, h('span', { class: 'pijl', style: 'transform:rotate(' + Math.round(c.wind_direction_10m + 180) + 'deg)', 'aria-hidden': 'true', text: '↑' }), ' ' + windRichting(c.wind_direction_10m) + ' ' + bft)),
+      cel('Golven', zc.wave_height != null ? zc.wave_height.toFixed(1).replace('.', ',') + ' m' : 'onbekend'),
+      cel('Hoogwater', hw ? hhmm(hw.tijd) : 'onbekend'),
+      cel('Laagwater', lw ? hhmm(lw.tijd) : 'onbekend'),
+      cel('Stoten (Bft)', String(vlaag)),
+      cel('Zeewater', zc.sea_surface_temperature != null ? Math.round(zc.sea_surface_temperature) + '°C' : 'onbekend'),
+      cel('Zon op', op ? hhmm(op) : ''),
+      cel('Zon onder', onder ? hhmm(onder) : '')),
+    h('div', { class: 'zee-tip', text: strandTip(c.temperature_2m, bft, regenNu) })));
+}
+
+function vanavondEten() {
+  if (!data || !data.eten) return '';
+  const k = KORT[new Date().getDay()];
+  const r = data.eten.find((e) => String(e.dag).toLowerCase() === k);
+  return r && r.gerecht ? r.gerecht : '';
+}
+
+function renderKopTip() {
+  const delen = [];
+  const eten = vanavondEten();
+  delen.push(eten ? h('span', null, 'Vanavond ', h('b', { text: eten })) : h('span', { text: 'Nog niks bedacht voor vanavond' }));
+  if (weer) {
+    const tijden = (weer.minutely_15 && weer.minutely_15.time || []).map((t) => new Date(t));
+    const mm = (weer.minutely_15 && weer.minutely_15.precipitation || []).map((v) => v || 0);
+    delen.push(h('span', { text: ' · ' + regenTekst(tijden, mm).tekst.toLowerCase() }));
+  }
+  $('#kop-tip').replaceChildren(...delen);
+}
+
+function renderChips() {
+  const chips = [];
+  const nu = new Date();
+  if (data && data.afval && data.afval.length) {
+    const a = data.afval[0];
+    const n = dagenTot(a.datum, nu);
+    const alle = data.afval.filter((x) => x.datum === a.datum).map((x) => x.soort).join(' + ');
+    if (n <= 1) chips.push(h('span', { class: 'chip afval-nu' }, (n === 0 ? 'Vandaag' : 'Morgen') + ': ' + alle + ' aan de straat'));
+    else chips.push(h('span', { class: 'chip' }, 'Afval ' + datumKort(vanKey(a.datum)) + ': ' + alle));
+  }
+  if (data && data.aftellen) {
+    data.aftellen
+      .filter((a) => /^\d{4}-\d{2}-\d{2}$/.test(a.datum) && dagenTot(a.datum, nu) >= 0)
+      .sort((a, b) => a.datum.localeCompare(b.datum)).slice(0, 2)
+      .forEach((a) => {
+        const n = dagenTot(a.datum, nu);
+        chips.push(h('span', { class: 'chip' }, n === 0 ? h('span', { text: 'Vandaag: ' + a.titel }) : [h('span', { class: 'n', text: String(n) }), (n === 1 ? 'dag tot ' : 'dagen tot ') + a.titel]));
+      });
+  }
+  $('#chips').replaceChildren(...chips);
+}
+
+function renderAgenda() {
+  const box = $('#agenda');
+  const items = (data && data.agenda) || [];
+  $('#agenda-bron').textContent = data && data.demo ? '' : 'komende 7 dagen';
+  if (!items.length) {
+    box.replaceChildren(h('div', { class: 'leeg', text: data ? 'Niks gepland deze week. Rustig hoor.' : 'Agenda laden…' }));
+    return;
+  }
+  const nu = new Date();
+  const vandaag = dagKey(nu);
+  const groepen = new Map();
+  items.forEach((ev) => {
+    const start = ev.heleDag ? vanKey(ev.start) : new Date(ev.start);
+    let k = dagKey(start);
+    if (k < vandaag) k = vandaag; // meerdaags, loopt nog
+    if (!groepen.has(k)) groepen.set(k, []);
+    groepen.get(k).push(Object.assign({}, ev, { _start: start, _eind: ev.heleDag ? vanKey(ev.eind) : new Date(ev.eind) }));
+  });
+  const morgen = dagKey(new Date(nu.getFullYear(), nu.getMonth(), nu.getDate() + 1));
+  const uit = [];
+  if (data.demo) uit.push(h('div', { class: 'voorbeeld', text: 'Voorbeeld' }));
+  [...groepen.keys()].sort().forEach((k) => {
+    const d = vanKey(k);
+    const naam = k === vandaag ? 'Vandaag' : k === morgen ? 'Morgen' : DAGNAMEN[d.getDay()];
+    uit.push(h('div', { class: 'ag-dag' }, naam, h('small', { text: d.getDate() + ' ' + MAANDEN[d.getMonth()] })));
+    groepen.get(k).sort((a, b) => (b.heleDag - a.heleDag) || (a._start - b._start)).forEach((ev) => {
+      const voorbij = !ev.heleDag && ev._eind < nu;
+      const bezig = !ev.heleDag && ev._start <= nu && ev._eind > nu;
+      uit.push(h('div', { class: 'ag-item' + (voorbij ? ' voorbij' : '') + (bezig ? ' nu' : ''), style: ev.kleur ? '--kleur:' + ev.kleur : null },
+        h('div', { class: 'ag-tijd' + (ev.heleDag ? ' hele' : ''), text: ev.heleDag ? 'hele dag' : hhmm(ev._start) }),
+        h('div', null, h('div', { class: 'ag-titel', text: ev.titel || '(zonder titel)' }), ev.plek ? h('div', { class: 'ag-plek', text: ev.plek }) : null)));
+    });
+  });
+  box.replaceChildren(...uit);
+}
+
+function renderEten() {
+  const box = $('#eten');
+  const rijen = (data && data.eten) || [];
+  if (!rijen.length) { box.replaceChildren(h('div', { class: 'leeg', text: data ? 'Draai setup in het script om het eetschema te maken.' : 'Laden…' })); return; }
+  const vandaag = KORT[new Date().getDay()];
+  box.replaceChildren(...rijen.map((r) => {
+    const dag = String(r.dag).toLowerCase();
+    if (bewerkDag === dag) {
+      const input = h('input', { id: 'eten-' + dag, value: r.gerecht || '', 'aria-label': 'Gerecht voor ' + dag, placeholder: 'Wat eten we?' });
+      const klaar = () => {
+        if (bewerkDag !== dag) return;
+        bewerkDag = null;
+        const v = input.value.trim();
+        if (v === (r.gerecht || '')) { renderEten(); return; }
+        stuur({ actie: 'eten', dag, gerecht: v }, (d) => { const x = d.eten.find((e) => String(e.dag).toLowerCase() === dag); if (x) x.gerecht = v; });
+      };
+      input.addEventListener('keydown', (e) => { if (e.key === 'Enter') klaar(); if (e.key === 'Escape') { bewerkDag = null; renderEten(); } });
+      input.addEventListener('blur', klaar);
+      setTimeout(() => input.focus(), 0);
+      return h('div', { class: 'eten-rij' + (dag === vandaag ? ' vandaag' : '') }, h('span', { class: 'd', text: dag }), input);
+    }
+    return h('button', { type: 'button', class: 'eten-rij' + (dag === vandaag ? ' vandaag' : ''), onclick: () => { bewerkDag = dag; renderEten(); } },
+      h('span', { class: 'd', text: dag }),
+      h('span', { class: 'g' + (r.gerecht ? '' : ' leeg-g'), text: r.gerecht || 'nog niks bedacht' }));
+  }));
+}
+
+function renderLijst(naam) {
+  const tab = naam === 'todo' ? 'Todo' : 'Boodschappen';
+  const veld = naam === 'todo' ? 'taak' : 'item';
+  const ul = $('#' + naam);
+  const items = (data && data[naam]) || [];
+  if (!items.length) {
+    ul.replaceChildren(h('li', { class: 'leeg', style: 'display:block', text: naam === 'todo' ? 'Alles af. Lekker bezig.' : 'Lijst is leeg. Typ hieronder wat er op moet.' }));
+    return;
+  }
+  const gesorteerd = [...items].sort((a, b) => a.gedaan - b.gedaan);
+  ul.replaceChildren(...gesorteerd.map((it) => h('li', { class: it.gedaan ? 'gedaan' : '' },
+    h('button', { type: 'button', class: 'vink', 'aria-label': (it.gedaan ? 'Niet af: ' : 'Afvinken: ') + it[veld],
+      onclick: () => stuur({ actie: 'afvinken', tab, id: it.id }, (d) => { const x = d[naam].find((y) => y.id === it.id); if (x) x.gedaan = !x.gedaan; }) },
+      icoon('vink')),
+    h('span', { class: 'tekst' }, it[veld], it.wie ? ' ' : null, it.wie ? h('span', { class: 'wie', text: it.wie }) : null),
+    h('button', { type: 'button', class: 'weg', 'aria-label': 'Verwijder ' + it[veld], text: '×',
+      onclick: () => stuur({ actie: 'verwijderen', tab, id: it.id }, (d) => { d[naam] = d[naam].filter((y) => y.id !== it.id); }) }))));
+}
+
+document.querySelectorAll('form.toevoegen').forEach((f) => {
+  f.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const input = f.querySelector('input');
+    let tekst = input.value.trim();
+    if (!tekst) return;
+    const tab = f.dataset.tab;
+    const naam = tab === 'Todo' ? 'todo' : 'boodschappen';
+    const velden = { id: uid() };
+    if (tab === 'Todo') {
+      const m = tekst.match(/@(\S+)/);
+      velden.wie = m ? m[1].charAt(0).toUpperCase() + m[1].slice(1) : '';
+      velden.taak = tekst.replace(/@\S+/, '').replace(/\s+/g, ' ').trim();
+    } else velden.item = tekst;
+    input.value = '';
+    stuur({ actie: 'toevoegen', tab, velden }, (d) => { d[naam] = (d[naam] || []).concat(Object.assign({ gedaan: false }, velden)); });
+  });
+});
+document.querySelectorAll('[data-opruimen]').forEach((b) => b.addEventListener('click', () => {
+  const tab = b.dataset.opruimen, naam = tab === 'Todo' ? 'todo' : 'boodschappen';
+  if (!data || !(data[naam] || []).some((x) => x.gedaan)) { meld('Er is nog niks afgevinkt'); return; }
+  stuur({ actie: 'opruimen', tab }, (d) => { d[naam] = d[naam].filter((x) => !x.gedaan); });
+}));
+
+function renderKids() {
+  const box = $('#kids');
+  const items = (data && data.kids) || [];
+  if (!items.length) { box.replaceChildren(h('div', { class: 'leeg', text: data ? 'Zet klusjes in de tab Kids van de Sheet.' : 'Laden…' })); return; }
+  const vandaag = dagKey(new Date());
+  const kinderen = [...new Set(items.map((k) => k.kind))];
+  box.replaceChildren(...kinderen.map((kind) => {
+    const taken = items.filter((k) => k.kind === kind);
+    const klaar = taken.filter((k) => k.gedaan_op === vandaag).length;
+    return h('div', { class: 'kind' + (klaar === taken.length ? ' alles' : '') },
+      h('div', { class: 'kind-kop' }, h('b', { text: kind }), h('span', { class: 'sterren', 'aria-label': klaar + ' van ' + taken.length + ' klaar', text: '★'.repeat(klaar) })),
+      ...taken.map((t) => h('button', { type: 'button', class: 'klusje' + (t.gedaan_op === vandaag ? ' klaar' : ''), text: t.taak,
+        onclick: () => stuur({ actie: 'afvinken', tab: 'Kids', id: t.id }, (d) => { const x = d.kids.find((y) => y.id === t.id); if (x) x.gedaan_op = x.gedaan_op === vandaag ? '' : vandaag; }) })));
+  }));
+}
+
+let laatsteNieuws = '';
+function renderNieuws() {
+  const items = (data && data.nieuws) || [];
+  const sleutel = items.map((n) => n.titel).join('|');
+  if (!items.length || sleutel === laatsteNieuws) return;
+  laatsteNieuws = sleutel;
+  const reeks = () => items.map((n) => h('span', { text: n.titel }));
+  const rail = $('#band');
+  rail.replaceChildren(...reeks(), ...reeks());
+  const tekens = items.reduce((s, n) => s + n.titel.length, 0);
+  rail.style.setProperty('--duur', Math.max(40, Math.round(tekens / 9)) + 's');
+}
+
+function renderNacht() {
+  const delen = [];
+  if (weer) {
+    const c = weer.current;
+    const tijden = (weer.minutely_15 && weer.minutely_15.time || []).map((t) => new Date(t));
+    const mm = (weer.minutely_15 && weer.minutely_15.precipitation || []).map((v) => v || 0);
+    delen.push(h('b', { text: Math.round(c.temperature_2m) + '°' }), ' · ' + regenTekst(tijden, mm).tekst.toLowerCase());
+  }
+  $('#n-weer').replaceChildren(...delen);
+
+  const nu = new Date();
+  const doel = nu.getHours() < 12 ? dagKey(nu) : dagKey(new Date(nu.getFullYear(), nu.getMonth(), nu.getDate() + 1));
+  const woord = doel === dagKey(nu) ? 'Vandaag' : 'Morgen';
+  const ev = ((data && data.agenda) || []).filter((e) => (e.heleDag ? e.start : dagKey(new Date(e.start))) === doel);
+  const regel = [];
+  if (ev.length) regel.push(woord + ': ', h('b', { text: ev.slice(0, 3).map((e) => (e.heleDag ? '' : hhmm(new Date(e.start)) + ' ') + e.titel).join(', ') }));
+  else regel.push(woord + ' niks in de agenda');
+  const af = data && data.afval && data.afval.find((a) => a.datum === doel);
+  if (af) regel.push(' · ', h('b', { text: af.soort + ' aan de straat' }));
+  $('#n-morgen').replaceChildren(...regel);
+}
+
+/* ================= Instellingen ================= */
+const dlg = $('#instellingen');
+$('#knop-instellingen').addEventListener('click', () => {
+  $('#in-url').value = cfg.url; $('#in-token').value = cfg.token;
+  if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', '');
+});
+$('#knop-annuleren').addEventListener('click', () => dlg.close());
+$('#form-instellingen').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const url = $('#in-url').value.trim(), token = $('#in-token').value.trim();
+  if (url && !/^https:\/\/script\.google(usercontent)?\.com\//.test(url)) { meld('Dat lijkt geen Apps Script-link. Die begint met https://script.google.com/'); return; }
+  cfg = { url, token };
+  opslag.set('ks_url', url); opslag.set('ks_token', token);
+  if (!url) opslag.set('ks_data', '');
+  data = url ? null : demoData();
+  dlg.close();
+  meld(url ? 'Opgeslagen, ik haal de gegevens op' : 'Ontkoppeld, je ziet weer voorbeelden');
+  laadData();
+});
+
+/* ================= Start ================= */
+tik();
+renderAlles();
+zetStatus();
+laadWeer();
+laadRadar();
+laadData();
+houdWakker();
+setInterval(tik, 1000);
+setInterval(laadWeer, 10 * 60e3);
+setInterval(laadRadar, 5 * 60e3);
+setInterval(() => { if (!isNachtTijd() || Date.now() % (5 * 60e3) < 60e3) laadData(); }, 60e3);
+</script>
+</body>
+</html>
