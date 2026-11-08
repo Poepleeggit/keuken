@@ -105,7 +105,7 @@ button { cursor: pointer; }
 .kolom { display: grid; gap: 14px; min-height: 0; }
 .k1 { grid-template-rows: auto minmax(110px, 1fr) auto; }
 .k2 { grid-template-rows: minmax(0, 1fr) auto auto; }
-.k3 { grid-template-rows: minmax(0, 1.25fr) minmax(0, 1fr) auto; }
+.k3 { grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); }
 
 .kaart {
   background: var(--panel); border: 1px solid var(--line); border-radius: var(--r);
@@ -446,10 +446,6 @@ dialog.breed { width: min(760px, calc(100vw - 24px)); max-height: calc(100vh - 3
           <input id="in-boodschappen" placeholder="Wat moet er mee?" autocomplete="off" aria-label="Nieuwe boodschap">
           <button type="submit">Erbij</button>
         </form>
-      </section>
-      <section class="kaart" id="k-kids" aria-label="Kinderen">
-        <div class="kaart-kop"><h2>Klusjes vandaag</h2></div>
-        <div class="kids" id="kids"></div>
       </section>
     </div>
   </main>
@@ -826,7 +822,7 @@ async function stuur(body, lokaal) {
 /* ================= Renderen ================= */
 function renderAlles() {
   renderUitgaven();
-  renderAgenda(); renderEten(); renderLijst('todo'); renderLijst('boodschappen'); renderKids(); renderChips(); renderNieuws(); renderKopTip();
+  renderAgenda(); renderEten(); renderLijst('todo'); renderLijst('boodschappen'); renderChips(); renderNieuws(); renderKopTip();
   if (!$('#nacht').hidden) renderNacht();
 }
 
