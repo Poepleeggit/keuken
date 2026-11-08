@@ -104,7 +104,7 @@ button { cursor: pointer; }
 }
 .kolom { display: grid; gap: 14px; min-height: 0; }
 .k1 { grid-template-rows: auto minmax(110px, 1fr) auto; }
-.k2 { grid-template-rows: 1fr auto; }
+.k2 { grid-template-rows: minmax(0, 1fr) auto auto; }
 .k3 { grid-template-rows: minmax(0, 1.25fr) minmax(0, 1fr) auto; }
 
 .kaart {
@@ -174,11 +174,12 @@ button { cursor: pointer; }
 /* ---- Eten ---- */
 .eten { display: grid; gap: 0; }
 .eten-rij {
-  display: grid; grid-template-columns: 40px 1fr; gap: 10px; align-items: center; padding: 6px 4px;
+  display: grid; grid-template-columns: 40px 1fr; gap: 10px; align-items: center; padding: 4px 4px;
   border-top: 1px solid var(--line); background: none; border-left: 0; border-right: 0; border-bottom: 0; text-align: left; width: 100%;
 }
 .eten-rij:first-child { border-top: 0; }
 .eten-rij .d { font: 600 16px/1 var(--f-display); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.eten-rij .g { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .eten-rij .g.leeg-g { color: var(--muted); font-style: italic; }
 .eten-rij.vandaag { background: var(--accent-soft); border-radius: 8px; border-top-color: transparent; }
 .eten-rij.vandaag .d { color: var(--accent); }
@@ -273,6 +274,71 @@ dialog input { padding: 10px 12px; border: 1px solid var(--line); border-radius:
 .radar-groot { position: fixed; inset: 0; z-index: 25; background: rgba(5, 11, 14, .85); display: grid; place-items: center; padding: 24px; }
 .radar-groot img { max-height: 100%; max-width: 100%; border-radius: var(--r); }
 
+/* ---- Uitgaven ---- */
+.uitgaven { gap: 8px; }
+.uit-rij { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; align-items: end; }
+.uit-bedrag { font: 700 38px/0.9 var(--f-display); font-variant-numeric: tabular-nums; }
+.uit-sub { color: var(--muted); font-size: 14px; font-variant-numeric: tabular-nums; }
+.uit-sub b { color: var(--ink); font-weight: 600; }
+.balk { height: 8px; border-radius: 999px; background: var(--line); overflow: hidden; position: relative; }
+.balk i { position: absolute; inset: 0 auto 0 0; background: var(--accent); border-radius: 999px; }
+.balk.over i { background: var(--warn); }
+.balk-tekst { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.advies-kort { font-size: 14px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; border-left: 3px solid var(--buoy); padding-left: 8px; }
+.bon-knop {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px; border: 0; border-radius: 999px;
+  padding: 6px 12px; background: var(--ink); color: var(--panel); font-weight: 700; font-size: 14px; white-space: nowrap;
+}
+.bon-knop svg { width: 18px; height: 18px; }
+.uitgaven .kaart-kop { align-items: center; }
+.uit-knop { display: grid; gap: 7px; text-align: left; background: none; border: 0; padding: 0; width: 100%; cursor: pointer; }
+.uit-meer { color: var(--accent); font-weight: 600; white-space: nowrap; }
+.eten { grid-template-columns: 1fr 1fr; grid-auto-flow: column; grid-template-rows: repeat(4, auto); column-gap: 14px; }
+.eten .eten-rij:nth-child(5) { border-top: 0; }
+.uitgaven .leeg { padding: 0; }
+
+dialog.breed { width: min(760px, calc(100vw - 24px)); max-height: calc(100vh - 32px); overflow-y: auto; padding: 18px 20px; }
+.dialoog-kop { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 8px; }
+.dialoog-kop h3 { margin: 0; }
+.knop-icoon.klein { width: 34px; height: 34px; font-size: 22px; line-height: 1; }
+.bezig { display: grid; justify-items: center; gap: 12px; padding: 28px 8px; text-align: center; color: var(--muted); }
+.bezig .rondje { width: 42px; height: 42px; border-radius: 50%; border: 4px solid var(--line); border-top-color: var(--accent); animation: draai 0.9s linear infinite; }
+@keyframes draai { to { transform: rotate(360deg); } }
+.bon-kop { display: grid; grid-template-columns: 1.4fr 1fr 0.9fr 1fr; gap: 10px; }
+.bon-kop label, .budget-form label { margin: 0; }
+.bon-kop input, .bon-kop select, .budget-form input { width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); }
+.waarschuwing { background: var(--buoy-soft); border: 1px solid var(--buoy); border-radius: 10px; padding: 8px 12px; font-size: 14px; margin: 10px 0 0; }
+.waarschuwing.ok { background: var(--accent-soft); border-color: var(--accent); }
+.bon-regels { margin: 12px 0; display: grid; gap: 0; }
+.bon-regel { display: grid; grid-template-columns: 1fr 56px 86px 32px; gap: 8px; align-items: center; padding: 6px 0; border-top: 1px solid var(--line); }
+.bon-regel input { width: 100%; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); min-width: 0; }
+.bon-regel input.r-totaal, .bon-regel input.r-aantal { text-align: right; font-variant-numeric: tabular-nums; }
+.bon-regel .meta { grid-column: 1 / -1; font-size: 12px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: -2px; }
+.label-chip { font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
+.label-chip.bonus { background: var(--buoy-soft); color: var(--ink); }
+.bon-som { display: flex; justify-content: space-between; font-weight: 700; padding-top: 8px; border-top: 2px solid var(--ink); font-variant-numeric: tabular-nums; }
+
+.ud-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 6px 0 14px; }
+.ud-stat { background: var(--bg); border-radius: 10px; padding: 10px 12px; display: grid; gap: 2px; }
+.ud-stat span { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+.ud-stat b { font: 700 24px/1 var(--f-display); font-variant-numeric: tabular-nums; }
+.ud-sectie { margin-top: 16px; }
+.ud-sectie h4 { margin: 0 0 6px; font: 600 15px/1 var(--f-display); text-transform: uppercase; letter-spacing: .09em; color: var(--muted); }
+.ud-lijst { list-style: none; margin: 0; padding: 0; }
+.ud-lijst li { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; border-top: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+.ud-lijst li:first-child { border-top: 0; }
+.ud-lijst .op { color: var(--warn); font-weight: 600; white-space: nowrap; }
+.ud-lijst .neer { color: var(--accent); font-weight: 600; white-space: nowrap; }
+.adviezen { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.adviezen li { border-left: 3px solid var(--buoy); background: var(--bg); padding: 8px 12px; border-radius: 0 8px 8px 0; }
+.adviezen li.goed { border-left-color: var(--accent); }
+.groep-rij { display: grid; grid-template-columns: 140px 1fr 70px; gap: 10px; align-items: center; padding: 3px 0; font-size: 14px; }
+.groep-rij .balk { height: 10px; }
+.groep-rij b { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+.budget-form { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.budget-form input { width: 120px; }
+.ud-lijst a { color: var(--accent); }
+
 /* ---- Telefoon / staand ---- */
 @media (max-width: 960px), (orientation: portrait) and (max-width: 1100px) {
   html, body { height: auto; }
@@ -286,9 +352,18 @@ dialog input { padding: 10px 12px; border: 1px solid var(--line); border-radius:
   .kolom { display: contents; }
   .kaart { order: 5; }
   #k-weer { order: 1; } #k-agenda { order: 2; } #k-boodschappen { order: 3; } #k-todo { order: 4; }
+  #k-uitgaven { order: 4; }
+  .uit-rij { grid-template-columns: 1fr; }
+  .bon-regel { grid-template-columns: 1fr 76px 32px; }
+  .bon-regel .r-aantal { display: none; }
+  .ud-stats { grid-template-columns: repeat(2, 1fr); }
   #k-eten { order: 5; } #k-kids { order: 6; } #k-zee { order: 7; } #k-radar { order: 8; aspect-ratio: 1; max-width: 100%; }
   .scroll { overflow: visible; }
   .kids { grid-template-columns: 1fr; }
+  .bon-kop { grid-template-columns: 1fr 1fr; }
+  .eten { grid-template-columns: 1fr; grid-auto-flow: row; grid-template-rows: none; }
+  .eten .eten-rij:nth-child(5) { border-top: 1px solid var(--line); }
+  .groep-rij { grid-template-columns: 100px 1fr 64px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .band-rail { animation: none; }
@@ -309,6 +384,7 @@ dialog input { padding: 10px 12px; border: 1px solid var(--line); border-radius:
     <symbol id="i-mist" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M8 18h32M12 25h28M8 32h28M14 39h22"/></symbol>
     <symbol id="i-vink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
     <symbol id="i-tandwiel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"/><circle cx="12" cy="13" r="3.5"/></symbol>
     <symbol id="i-maan-knop" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></symbol>
   </defs>
 </svg>
@@ -345,8 +421,12 @@ dialog input { padding: 10px 12px; border: 1px solid var(--line); border-radius:
         <div class="scroll" id="agenda"></div>
       </section>
       <section class="kaart" id="k-eten" aria-label="Eetschema">
-        <div class="kaart-kop"><h2>Wat eten we</h2><small>tik op een dag om te wijzigen</small></div>
+        <div class="kaart-kop"><h2>Wat eten we</h2><small>tik om te wijzigen</small></div>
         <div class="eten" id="eten"></div>
+      </section>
+      <section class="kaart uitgaven" id="k-uitgaven" aria-label="Uitgaven boodschappen">
+        <div class="kaart-kop"><h2>Boodschappen</h2><button class="bon-knop" type="button" id="knop-bon"><svg aria-hidden="true"><use href="#i-camera"/></svg>Bon toevoegen</button></div>
+        <button type="button" class="uit-knop" id="uitgaven" aria-label="Details uitgaven openen"><span class="leeg">Uitgaven laden…</span></button>
       </section>
     </div>
 
@@ -410,6 +490,17 @@ dialog input { padding: 10px 12px; border: 1px solid var(--line); border-radius:
       <button type="submit" class="klein-knop" id="knop-opslaan">Opslaan</button>
     </div>
   </form>
+</dialog>
+
+<input type="file" id="bon-input" accept="image/*" capture="environment" hidden>
+
+<dialog id="bon-dialoog" class="breed">
+  <div id="bon-inhoud"></div>
+</dialog>
+
+<dialog id="uitgaven-dialoog" class="breed">
+  <div class="dialoog-kop"><h3>Uitgaven boodschappen</h3><button type="button" class="knop-icoon klein" id="uitgaven-sluiten" aria-label="Sluiten">×</button></div>
+  <div id="uitgaven-details"></div>
 </dialog>
 
 <div class="melding" id="melding" hidden></div>
@@ -591,6 +682,15 @@ function demoData() {
     ],
     afval: [{ datum: dk(1), soort: mark('GFT') }],
     nieuws: [{ titel: 'Koppel het dashboard aan je Google Sheet voor echt nieuws, agenda en lijsten' }],
+    uitgaven: {
+      categorie: 'Boodschappen', week: 45, maand: 136.1, vorigeMaand: 312.4, vorigeMaandTotNu: 84.2, budget: 350, prognose: 510,
+      bonnenMaand: 2, bonnenTotaal: 3, besparingBonus: 2.5, huismerkAandeel: 75,
+      groepen: [{ groep: 'zuivel', bedrag: 28.54 }, { groep: 'koffie en thee', bedrag: 7.49 }],
+      topProducten: [{ product: mark('melk'), bedrag: 16.1, aantal: 14 }],
+      prijzen: [{ product: mark('melk'), van: 1.05, naar: 1.15, sinds: dk(-34), procent: 9.5, keer: 3 }],
+      merkKansen: [], recent: [{ datum: dk(-1), winkel: 'DekaMarkt', totaal: 45, regels: 3, door: '', foto: '' }],
+      adviezen: [{ soort: 'huismerk', tekst: mark('het huismerk melk is € 0,60 per pak goedkoper, dat scheelt zo\'n € 22 per jaar.') }],
+    },
   };
 }
 
@@ -725,6 +825,7 @@ async function stuur(body, lokaal) {
 
 /* ================= Renderen ================= */
 function renderAlles() {
+  renderUitgaven();
   renderAgenda(); renderEten(); renderLijst('todo'); renderLijst('boodschappen'); renderKids(); renderChips(); renderNieuws(); renderKopTip();
   if (!$('#nacht').hidden) renderNacht();
 }
@@ -899,7 +1000,7 @@ function renderEten() {
     }
     return h('button', { type: 'button', class: 'eten-rij' + (dag === vandaag ? ' vandaag' : ''), onclick: () => { bewerkDag = dag; renderEten(); } },
       h('span', { class: 'd', text: dag }),
-      h('span', { class: 'g' + (r.gerecht ? '' : ' leeg-g'), text: r.gerecht || 'nog niks bedacht' }));
+      h('span', { class: 'g' + (r.gerecht ? '' : ' leeg-g'), text: r.gerecht || 'nog niks' }));
   }));
 }
 
@@ -960,6 +1061,236 @@ function renderKids() {
       ...taken.map((t) => h('button', { type: 'button', class: 'klusje' + (t.gedaan_op === vandaag ? ' klaar' : ''), text: t.taak,
         onclick: () => stuur({ actie: 'afvinken', tab: 'Kids', id: t.id }, (d) => { const x = d.kids.find((y) => y.id === t.id); if (x) x.gedaan_op = x.gedaan_op === vandaag ? '' : vandaag; }) })));
   }));
+}
+
+/* ================= Uitgaven ================= */
+const euro = (n, dec = 2) => '€ ' + (Number(n) || 0).toFixed(dec).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+const getal = (v) => { const n = parseFloat(String(v == null ? '' : v).replace(/[€\s]/g, '').replace(',', '.')); return isFinite(n) ? n : 0; };
+const datumNL = (k) => { if (!/^\d{4}-\d{2}-\d{2}$/.test(k || '')) return k || ''; const d = vanKey(k); return d.getDate() + ' ' + MAANDEN[d.getMonth()].slice(0, 3); };
+
+function renderUitgaven() {
+  const box = $('#uitgaven');
+  const u = data && data.uitgaven;
+  if (!u) { box.replaceChildren(h('div', { class: 'leeg', text: data ? 'Nog geen bonnen. Maak een foto van je eerste bon.' : 'Laden…' })); return; }
+  const delen = [];
+  if (data.demo) delen.push(h('div', { class: 'voorbeeld', text: 'Voorbeeld' }));
+  const verschil = u.maand - u.vorigeMaandTotNu;
+  delen.push(h('div', { class: 'uit-rij' },
+    h('div', { class: 'uit-bedrag', text: euro(u.maand) }),
+    h('div', { class: 'uit-sub' }, 'week ', h('b', { text: euro(u.week) }), u.vorigeMaandTotNu > 0
+      ? ' · ' + (verschil >= 0 ? euro(verschil, 0) + ' meer' : euro(-verschil, 0) + ' minder') + ' dan vorige maand'
+      : (u.bonnenMaand ? ' · ' + u.bonnenMaand + (u.bonnenMaand === 1 ? ' bon' : ' bonnen') : ''))));
+  if (u.budget > 0) {
+    const pct = Math.min(100, u.maand / u.budget * 100);
+    const over = (u.prognose || u.maand) > u.budget;
+    delen.push(h('div', { class: 'balk' + (over ? ' over' : ''), role: 'img', 'aria-label': Math.round(pct) + '% van budget' }, h('i', { style: 'width:' + pct.toFixed(1) + '%' })));
+    delen.push(h('div', { class: 'balk-tekst' },
+      h('span', { text: 'budget ' + euro(u.budget, 0) + (u.prognose ? ' · op koers voor ' + euro(u.prognose, 0) : '') }),
+      h('span', { class: 'uit-meer', text: 'details ›' })));
+  } else {
+    delen.push(h('div', { class: 'balk-tekst' }, h('span', { text: 'nog geen budget ingesteld' }), h('span', { class: 'uit-meer', text: 'details ›' })));
+  }
+  if (u.adviezen && u.adviezen.length) delen.push(h('div', { class: 'advies-kort', text: u.adviezen[0].tekst }));
+  box.replaceChildren(...delen);
+  // Detailscherm alleen verversen als niemand er aan het typen is.
+  if (!$('#uitgaven-dialoog').open || $('#uitgaven-dialoog').contains(document.activeElement) && document.activeElement.tagName === 'INPUT') return;
+  renderUitgavenDetails();
+}
+
+function renderUitgavenDetails() {
+  const u = data && data.uitgaven;
+  const box = $('#uitgaven-details');
+  if (!u) { box.replaceChildren(h('p', { text: 'Nog geen bonnen opgeslagen.' })); return; }
+  const stat = (label, waarde) => h('div', { class: 'ud-stat' }, h('span', { text: label }), h('b', { text: waarde }));
+  const sectie = (titel, ...inhoud) => h('section', { class: 'ud-sectie' }, h('h4', { text: titel }), ...inhoud);
+  const uit = [];
+  if (data.demo) uit.push(h('div', { class: 'voorbeeld', text: 'Voorbeeld' }));
+  uit.push(h('div', { class: 'ud-stats' },
+    stat('Deze maand', euro(u.maand)), stat('Deze week', euro(u.week)), stat('Vorige maand', euro(u.vorigeMaand)),
+    stat('Bonus bespaard', euro(u.besparingBonus))));
+
+  uit.push(sectie('Adviezen', u.adviezen && u.adviezen.length
+    ? h('ul', { class: 'adviezen' }, u.adviezen.map((a) => h('li', { class: a.soort === 'goed' ? 'goed' : '', text: a.tekst })))
+    : h('p', { class: 'leeg', text: 'Nog niks op te merken. Hoe meer bonnen, hoe beter de adviezen.' })));
+
+  const form = h('form', { class: 'budget-form' },
+    h('label', { for: 'in-budget', text: 'Maandbudget' }),
+    h('input', { id: 'in-budget', type: 'number', inputmode: 'decimal', min: '0', step: '10', value: u.budget || '', placeholder: 'bijv. 400' }),
+    h('button', { type: 'submit', class: 'klein-knop', text: 'Opslaan' }),
+    u.huismerkAandeel != null ? h('span', { class: 'uit-sub', text: 'Huismerk deze maand: ' + u.huismerkAandeel + '% van je producten' }) : null);
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const bedrag = getal($('#in-budget').value);
+    stuur({ actie: 'budget', categorie: 'Boodschappen', bedrag }, (d) => { if (d.uitgaven) d.uitgaven.budget = bedrag; });
+    meld(bedrag > 0 ? 'Budget opgeslagen' : 'Budget gewist');
+  });
+  uit.push(sectie('Budget', form));
+
+  if (u.groepen && u.groepen.length) {
+    const max = Math.max(...u.groepen.map((g) => g.bedrag), 1);
+    uit.push(sectie('Waar gaat het geld heen (deze maand)', ...u.groepen.map((g) => h('div', { class: 'groep-rij' },
+      h('span', { text: g.groep }), h('div', { class: 'balk' }, h('i', { style: 'width:' + (g.bedrag / max * 100).toFixed(1) + '%' })), h('b', { text: euro(g.bedrag) })))));
+  }
+  if (u.topProducten && u.topProducten.length) {
+    uit.push(sectie('Grootste posten', h('ul', { class: 'ud-lijst' }, u.topProducten.map((p) =>
+      h('li', null, h('span', { text: p.product + (p.aantal > 1 ? ' (' + String(p.aantal).replace('.', ',') + '×)' : '') }), h('b', { text: euro(p.bedrag) }))))));
+  }
+  uit.push(sectie('Prijsontwikkeling', u.prijzen && u.prijzen.length
+    ? h('ul', { class: 'ud-lijst' }, u.prijzen.map((p) => h('li', null,
+        h('span', { text: p.product + ' · sinds ' + datumNL(p.sinds) }),
+        h('span', { class: p.procent > 0 ? 'op' : 'neer', text: euro(p.van) + ' → ' + euro(p.naar) + ' (' + (p.procent > 0 ? '+' : '') + String(p.procent).replace('.', ',') + '%)' }))))
+    : h('p', { class: 'leeg', text: 'Zichtbaar zodra je hetzelfde product vaker hebt gekocht.' })));
+  if (u.merkKansen && u.merkKansen.length) {
+    uit.push(sectie('Huismerk-kansen', h('ul', { class: 'ud-lijst' }, u.merkKansen.map((k) => h('li', null,
+      h('span', { text: k.aMerk + ' → ' + k.huismerk }), h('span', { class: 'neer', text: '± ' + euro(k.perJaar, 0) + ' per jaar' }))))));
+  }
+  if (u.recent && u.recent.length) {
+    uit.push(sectie('Laatste bonnen', h('ul', { class: 'ud-lijst' }, u.recent.map((b) => h('li', null,
+      h('span', null, datumNL(b.datum) + ' · ' + b.winkel + (b.door ? ' · ' + b.door : '') + ' ', b.foto ? h('a', { href: b.foto, target: '_blank', rel: 'noopener', text: 'foto' }) : null),
+      h('b', { text: euro(b.totaal) }))))));
+  }
+  box.replaceChildren(...uit);
+}
+
+function openDialoog(dlgEl) { if (dlgEl.showModal) { if (!dlgEl.open) dlgEl.showModal(); } else dlgEl.setAttribute('open', ''); }
+$('#uitgaven').addEventListener('click', () => { renderUitgavenDetails(); openDialoog($('#uitgaven-dialoog')); });
+$('#uitgaven-sluiten').addEventListener('click', () => $('#uitgaven-dialoog').close());
+
+/* ---- Bon toevoegen ---- */
+let bonConcept = null;
+$('#knop-bon').addEventListener('click', () => {
+  if (isDemo()) { meld('Koppel eerst het dashboard (tandwiel rechtsonder), dan kun je bonnen toevoegen'); return; }
+  $('#bon-input').value = '';
+  $('#bon-input').click();
+});
+$('#bon-input').addEventListener('change', async () => {
+  const f = $('#bon-input').files && $('#bon-input').files[0];
+  if (!f) return;
+  toonBonBezig('Foto verkleinen…');
+  openDialoog($('#bon-dialoog'));
+  try {
+    const foto = await verklein(f, 2200, 0.82);
+    toonBonBezig('Bon lezen… dit duurt meestal 10 tot 20 seconden');
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 120000);
+    const r = await fetch(cfg.url, {
+      method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, signal: ctrl.signal,
+      body: JSON.stringify({ token: cfg.token, actie: 'bonLezen', mime: 'image/jpeg', foto }),
+    });
+    clearTimeout(timer);
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.fout || 'Onbekende fout');
+    bonConcept = j.bon;
+    bonConcept.id = uid();
+    toonBonControle();
+  } catch (e) {
+    toonBonFout(e.name === 'AbortError' ? 'Het lezen duurde te lang. Probeer het nog eens.' : e.message);
+  }
+});
+
+function verklein(file, maxZijde, kwaliteit) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      const schaal = Math.min(1, maxZijde / Math.max(img.naturalWidth, img.naturalHeight));
+      const c = document.createElement('canvas');
+      c.width = Math.round(img.naturalWidth * schaal); c.height = Math.round(img.naturalHeight * schaal);
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);
+      ctx.drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url);
+      resolve(c.toDataURL('image/jpeg', kwaliteit).split(',')[1]);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Deze foto kan ik niet openen. Probeer een gewone foto (JPG).')); };
+    img.src = url;
+  });
+}
+
+function toonBonBezig(tekst) {
+  $('#bon-inhoud').replaceChildren(h('div', { class: 'bezig' }, h('div', { class: 'rondje', 'aria-hidden': 'true' }), h('div', { text: tekst })));
+}
+function toonBonFout(tekst) {
+  $('#bon-inhoud').replaceChildren(
+    h('div', { class: 'dialoog-kop' }, h('h3', { text: 'Dat lukte niet' })),
+    h('p', { text: tekst }),
+    h('div', { class: 'dialoog-knoppen' },
+      h('button', { type: 'button', class: 'klein-knop zacht', text: 'Sluiten', onclick: () => $('#bon-dialoog').close() }),
+      h('button', { type: 'button', class: 'klein-knop', text: 'Andere foto', onclick: () => { $('#bon-dialoog').close(); $('#knop-bon').click(); } })));
+}
+
+function bonSom() { return (bonConcept.regels || []).reduce((s, r) => s + getal(r.totaal), 0); }
+
+function toonBonControle() {
+  const b = bonConcept;
+  const naam = opslag.get('ks_naam') || '';
+  const veld = (id, label, attrs) => h('label', { for: id }, label, h('input', Object.assign({ id }, attrs)));
+  const kop = h('div', { class: 'bon-kop' },
+    veld('bon-winkel', 'Winkel', { value: b.winkel || '', oninput: (e) => { b.winkel = e.target.value; } }),
+    veld('bon-datum', 'Datum', { type: 'date', value: b.datum || '', oninput: (e) => { b.datum = e.target.value; } }),
+    veld('bon-totaal', 'Totaal', { inputmode: 'decimal', value: String((b.totaal || 0).toFixed(2)).replace('.', ','), oninput: (e) => { b.totaal = getal(e.target.value); werkSomBij(); } }),
+    h('label', { for: 'bon-door' }, 'Wie', h('select', { id: 'bon-door', onchange: (e) => opslag.set('ks_naam', e.target.value) },
+      ['', 'Brian', 'Femke', 'Anders'].map((n) => { const o = h('option', { value: n, text: n || 'kies…' }); if (n === naam) o.selected = true; return o; }))));
+
+  const lijst = h('div', { class: 'bon-regels' });
+  const tekenRegels = () => lijst.replaceChildren(...b.regels.map((r, i) => {
+    const meta = h('div', { class: 'meta' }, h('span', { text: r.omschrijving }),
+      r.huismerk ? h('span', { class: 'label-chip', text: 'huismerk' }) : null,
+      r.bonus ? h('span', { class: 'label-chip bonus', text: 'bonus −' + euro(r.korting) }) : null,
+      r.groep ? h('span', { text: '· ' + r.groep }) : null);
+    return h('div', { class: 'bon-regel' },
+      h('input', { id: 'r-p-' + i, value: r.product || r.omschrijving, 'aria-label': 'Product', oninput: (e) => { r.product = e.target.value; } }),
+      h('input', { id: 'r-a-' + i, class: 'r-aantal', inputmode: 'decimal', value: String(r.aantal).replace('.', ','), 'aria-label': 'Aantal',
+        oninput: (e) => { r.aantal = getal(e.target.value) || 1; r.stukprijs = Math.round(getal(r.totaal) / r.aantal * 100) / 100; } }),
+      h('input', { id: 'r-t-' + i, class: 'r-totaal', inputmode: 'decimal', value: getal(r.totaal).toFixed(2).replace('.', ','), 'aria-label': 'Bedrag',
+        oninput: (e) => { r.totaal = getal(e.target.value); r.stukprijs = Math.round(r.totaal / (r.aantal || 1) * 100) / 100; werkSomBij(); } }),
+      h('button', { type: 'button', class: 'weg', 'aria-label': 'Regel verwijderen', text: '×', onclick: () => { b.regels.splice(i, 1); tekenRegels(); werkSomBij(); } }),
+      meta);
+  }));
+  tekenRegels();
+
+  const somRegel = h('div', { class: 'bon-som' });
+  const check = h('div', { class: 'waarschuwing' });
+  function werkSomBij() {
+    const s = bonSom();
+    somRegel.replaceChildren(h('span', { text: b.regels.length + ' regels' }), h('span', { text: euro(s) }));
+    const verschil = Math.abs(s - getal(b.totaal));
+    check.className = 'waarschuwing' + (verschil < 0.05 ? ' ok' : '');
+    check.textContent = verschil < 0.05 ? 'De regels tellen precies op tot het totaal.' :
+      'De regels tellen op tot ' + euro(s) + ', de bon zegt ' + euro(b.totaal) + '. Kijk of een bedrag niet klopt, of sla toch op.';
+  }
+  werkSomBij();
+
+  $('#bon-inhoud').replaceChildren(...[
+    h('div', { class: 'dialoog-kop' }, h('h3', { text: 'Klopt dit?' }), h('button', { type: 'button', class: 'knop-icoon klein', 'aria-label': 'Sluiten', text: '×', onclick: () => $('#bon-dialoog').close() })),
+    h('p', { text: 'Pas aan wat niet goed gelezen is. Producten en bedragen mag je overtypen.' }),
+    kop,
+    b.mogelijkDubbel ? h('div', { class: 'waarschuwing', text: 'Let op: er staat al een bon van deze datum met hetzelfde totaal. Misschien heb je hem al toegevoegd.' }) : null,
+    check, lijst, somRegel,
+    h('div', { class: 'dialoog-knoppen', style: 'margin-top:14px' },
+      h('button', { type: 'button', class: 'klein-knop zacht', text: 'Niet opslaan', onclick: () => $('#bon-dialoog').close() }),
+      h('button', { type: 'button', class: 'klein-knop', id: 'bon-opslaan', text: 'Opslaan', onclick: bonOpslaan })),
+  ].filter(Boolean));
+}
+
+async function bonOpslaan() {
+  const knop = $('#bon-opslaan');
+  knop.disabled = true; knop.textContent = 'Opslaan…';
+  try {
+    const r = await fetch(cfg.url, {
+      method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ token: cfg.token, actie: 'bonOpslaan', door: $('#bon-door').value, bon: bonConcept }),
+    });
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.fout);
+    $('#bon-dialoog').close();
+    meld('Bon opgeslagen: ' + euro(bonConcept.totaal) + ' bij ' + (bonConcept.winkel || 'de winkel'));
+    bonConcept = null;
+    laadData();
+  } catch (e) {
+    knop.disabled = false; knop.textContent = 'Opslaan';
+    meld('Opslaan lukte niet' + (e.message ? ': ' + e.message : ''));
+  }
 }
 
 let laatsteNieuws = '';
