@@ -430,10 +430,13 @@ const opslag = {
 (function koppelViaLink() {
   const m = location.hash.match(/^#koppel=([A-Za-z0-9_-]{20,120})~([A-Za-z0-9_-]{6,80})$/);
   if (!m) return;
-  opslag.set('ks_url', 'https://script.google.com/macros/s/' + m[1] + '/exec');
-  opslag.set('ks_token', m[2]);
-  opslag.set('ks_data', '');
-  try { history.replaceState(null, '', location.pathname + location.search); } catch (e) { location.hash = ''; }
+  // De code blijft bewust in de link staan: zo neemt een icoon op het iPhone-beginscherm de koppeling mee.
+  const url = 'https://script.google.com/macros/s/' + m[1] + '/exec';
+  if (opslag.get('ks_url') !== url || opslag.get('ks_token') !== m[2]) {
+    opslag.set('ks_url', url);
+    opslag.set('ks_token', m[2]);
+    opslag.set('ks_data', '');
+  }
 })();
 let cfg = { url: opslag.get('ks_url') || '', token: opslag.get('ks_token') || '' };
 const isDemo = () => !cfg.url;
